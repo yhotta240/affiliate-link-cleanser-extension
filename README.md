@@ -1,4 +1,4 @@
-# AAffiliate Link Cleanser for X/Twitter - アフィリエイトリンク洗浄ツール
+# Affiliate Link Cleanser for X/Twitter - アフィリエイトリンク洗浄ツール
 X（旧Twitter）上に投稿されるアフィリエイトリンクを洗浄し，ユーザがオリジナルのURLに直接アクセスできるようにするツールです。
 
 ## 説明
