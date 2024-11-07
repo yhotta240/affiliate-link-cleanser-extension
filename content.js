@@ -6,10 +6,8 @@ const observer = new MutationObserver(() => {
 // Sampleツールの有効/無効を処理する関数
 const handleSampleTool = (isEnabled) => {
   if (isEnabled) {
-    console.log("SampleがONになりました");
     observer.observe(document.body, { childList: true, subtree: true });
   } else {
-    console.log("SampleがOFFになりました");
     observer.disconnect();
   }
 };
@@ -76,51 +74,4 @@ function extractUrl(affiliateUrl) {
     return '元のURLが見つかりません';
   }
 }
-
-
-
-// バックグラウンドスクリプトから受け取ったHTMLを解析
-// chrome.storage からデータを取得して解析
-// chrome.storage.local.get('htmlText', function (result) {
-//   if (result.htmlText) {
-//     console.log('抽出した詳細情報:', result.htmlText);
-//     const details = extractDetails(result.htmlText);
-
-//   } else {
-//     console.log('HTMLテキストがchrome.storageに保存されていません');
-//   }
-// });
-
-
-// function extractDetails(htmlText) {
-//   const parser = new DOMParser();
-//   const doc = parser.parseFromString(htmlText, 'text/html');
-//   const rootElement = doc.getElementById('root');
-//   console.log('rootElement:', rootElement);
-//   // JSON-LDのscriptタグを抽出
-//   // const jsonLdScript = doc.querySelector('script[type="application/ld+json"]');
-//   // console.log('抽出した詳細情報:', jsonLdScript);
-//   // if (jsonLdScript) {
-//   //   // JSONデータをパース
-//   //   const jsonData = JSON.parse(jsonLdScript.textContent);
-
-//   //   // 必要な情報を抽出
-//   //   const productDetails = {
-//   //     seriesName: jsonData.name || '', // 作品名 (シリーズ名)
-//   //     author: jsonData.author?.name[0] || '', // 作家
-//   //     label: jsonData.subjectOf?.url ? jsonData.subjectOf.url.split("/")[5] : '', // レーベル
-//   //     publisher: jsonData.publisher?.name || '', // 出版社
-//   //     categories: jsonData.genre || [], // カテゴリー（複数のジャンル）
-//   //     genres: jsonData.genre || [], // ジャンル（複数）
-//   //     publishDate: jsonData.dateCreated || '', // 配信開始日
-//   //     fileSize: jsonData.offers?.price || '', // ファイル価格（価格はファイルサイズの代わり）
-//   //     fileFormat: jsonData.offers?.priceCurrency || '' // ファイル形式（価格通貨）
-//   //   };
-
-//   //   return productDetails;
-//   // } else {
-//   //   console.error('JSON-LD script not found.');
-//   //   return null;
-//   // }
-// }
 
