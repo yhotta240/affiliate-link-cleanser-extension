@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Affiliate Link Cleanser for X/Twitter - アフィリエイトリンク洗浄ツール",
+  "version": "1.0.0",
+  "description": "X（旧Twitter）上に投稿されるアフィリエイトリンクを洗浄し，ユーザがオリジナルのURLに直接アクセスできるようにするツールです。",
+  "icons": {
+    "48": "icons/icon.png"
+  },
+  "permissions": ["contextMenus", "storage"],
+  "action": {
+    "default_popup": "popup/popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://x.com/*", "https://twitter.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
