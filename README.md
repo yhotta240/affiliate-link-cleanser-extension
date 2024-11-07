@@ -18,7 +18,7 @@ X/Twitterタイムライン上でアフィリエイトリンクを検出し，�
 ## 使用方法
 #### Affiliate Link Cleanserを有効にする
 拡張機能のポップアップを開き，「Affiliate Link Cleanser を有効にする」のトグルボタンをクリック
-X/Twitter上で右クリックし，メニューから「Easy Web Blur：有効にする」を選択する
+X/Twitter上で右クリックし，メニューから「Affiliate Link Cleanser：有効にする」を選択する
 無効にする場合も同じ操作を行ってください。
 #### 使用例
 有効な状態でX/Twitterにアクセスすると，該当するアフィリエイトリンクが含まれている投稿の上部に，オリジナルのURLが表示されます。
