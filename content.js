@@ -35,7 +35,7 @@ function getTweetTexts() {
       const text = tweetTextElement.innerText;
 
       if (text.includes("オリジナル URL")) {
-        return;  // すでに処理済みなのでスキップ
+        return;
       }
       // const urlPattern = new RegExp(userUrls.map(url => url.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1")).join('|') + '[^\\s]+', 'g');
       // URLを抽出するための正規表現
@@ -46,8 +46,20 @@ function getTweetTexts() {
         const cleanedUrls = urls.map(url => url.replace(/…[」】]$/, ''));
         const affiliateUrls = [];
         affiliateUrls.push(...cleanedUrls);
-        const url = extractUrl(affiliateUrls[0]);
-        const formattedText = `<strong style="color: #2d87f0;">オリジナル URL:</strong><br><a href="${url}" target="_blank" style="color: #ff6600; text-decoration: underline;">${url}</a><br><br>${text.replace(affiliateUrls[0], `<del>${shortenUrl(affiliateUrls[0])}</del>`)}`;
+        // 各URLを処理
+        let formattedText = text;
+        affiliateUrls.forEach(url => {
+          const originalUrl = extractUrl(url);
+          let beforeUrlText = formattedText.substring(formattedText.indexOf(url) - 1, formattedText.indexOf(url));
+          beforeUrlText = beforeUrlText.trim() ? beforeUrlText : "";
+          console.log("beforeUrlText", beforeUrlText);
+          // 正規化されたURLを表示
+          const originalUrlLink = `<a href="${originalUrl}" target="_blank" style="color: #ff6600; text-decoration: underline;">${originalUrl} </a>`;
+          const replacementText = `<strong style="color: #2d87f0;">オリジナル URL:</strong><br>${originalUrlLink}<br>` + beforeUrlText + `<del>${shortenUrl(url)}</del>`;
+          formattedText = formattedText.replace(url, replacementText);
+          formattedText = formattedText.replace(beforeUrlText, "");
+        });
+
         tweetTextElement.innerHTML = formattedText;
       }
     }
@@ -64,7 +76,7 @@ function shortenUrl(url, maxLength = 20) {
 function extractUrl(affiliateUrl) {
   const urlParams = new URLSearchParams(new URL(affiliateUrl).search);
   const encodedOriginalUrl = urlParams.get('lurl');
-  
+
   if (encodedOriginalUrl) {
     let originalUrl = decodeURIComponent(encodedOriginalUrl);
     const cleanUrl = originalUrl.split('?')[0].split('#')[0];
@@ -74,4 +86,3 @@ function extractUrl(affiliateUrl) {
     return '元のURLが見つかりません';
   }
 }
-
