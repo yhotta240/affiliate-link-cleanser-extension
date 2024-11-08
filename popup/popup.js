@@ -1,9 +1,9 @@
 // 初期化処理
 let isEnabled = false; // ツールの有効状態を示すフラグ（初期値はfalse）
 const enabledElement = document.getElementById('enabled');
-const panelButton  = document.getElementById('panelButton');
+const panelButton = document.getElementById('panelButton');
 const messagePanel = document.getElementById('messagePanel');
-const messageDiv = document.getElementById('message'); 
+const messageDiv = document.getElementById('message');
 
 
 // チェックボックス（トグルボタン）の状態が変更されたとき，ツールの有効/無効状態を更新
@@ -20,7 +20,7 @@ enabledElement.addEventListener('change', (event) => {
 chrome.storage.local.get('isEnabled', (data) => {
   if (enabledElement) {
     isEnabled = data.isEnabled || false;
-    enabledElement.checked = isEnabled; 
+    enabledElement.checked = isEnabled;
   }
   messageOutput(dateTime(), isEnabled ? 'Affiliate Link Cleanserは有効になっています' : 'Affiliate Link Cleanserは無効になっています');
 });
@@ -34,12 +34,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (messagePanel.style.height === panelHeight) {
       messagePanel.style.height = '0';
-      panelButton.textContent   = 'メッセージパネルを開く';
+      panelButton.textContent = 'メッセージパネルを開く';
     } else {
       messagePanel.style.height = panelHeight;
-      panelButton.textContent   = 'メッセージパネルを閉じる';
+      panelButton.textContent = 'メッセージパネルを閉じる';
     }
   });
+
+  // チュートリアルタブ
+  const twitterLink = document.getElementById('twitter-link');
+  if (twitterLink) clickURL(twitterLink);
 
   // 情報タブ: 
   const storeLink = document.getElementById('store_link');
@@ -85,7 +89,7 @@ function clickURL(link) {
 
   if (link instanceof HTMLElement) {
     link.addEventListener('click', (event) => {
-      event.preventDefault(); 
+      event.preventDefault();
       chrome.tabs.create({ url });
     });
   }
@@ -96,7 +100,7 @@ function messageOutput(datetime, message) {
   messageDiv.innerHTML += '<p class="m-0">' + datetime + ' ' + message + '</p>';
 }
 document.getElementById('messageClearButton').addEventListener('click', () => {
-  messageDiv.innerHTML = '<p class="m-0">' + '' + '</p>'; 
+  messageDiv.innerHTML = '<p class="m-0">' + '' + '</p>';
 });
 
 
