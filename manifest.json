@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Affiliate Link Cleanser for X/Twitter - アフィリエイトリンク洗浄ツール",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "X（旧Twitter）上に投稿されるアフィリエイトリンクを洗浄し，ユーザがオリジナルのURLに直接アクセスできるようにするツールです。",
   "icons": {
     "48": "icons/icon.png"
