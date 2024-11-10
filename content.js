@@ -31,40 +31,86 @@ function getTweetTexts() {
   const tweetElements = document.querySelectorAll('[data-testid="cellInnerDiv"]');
   tweetElements.forEach(tweetElement => {
     const tweetTextElement = tweetElement.querySelector('[data-testid="tweetText"]');
-    if (tweetTextElement) {
-      const text = tweetTextElement.innerText;
+    if (!tweetTextElement) return;
 
-      if (text.includes("オリジナル URL")) {
-        return;
-      }
-      // const urlPattern = new RegExp(userUrls.map(url => url.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1")).join('|') + '[^\\s]+', 'g');
-      // URLを抽出するための正規表現
-      const urlPattern = /https:\/\/al\.dmm\.co\.jp\/[^\s]+/g;
-      const urls = text.match(urlPattern);
-      // console.log(urls);
-      if (urls) {
-        const cleanedUrls = urls.map(url => url.replace(/…[」】]$/, ''));
-        const affiliateUrls = [];
-        affiliateUrls.push(...cleanedUrls);
-        // 各URLを処理
-        let formattedText = text;
-        affiliateUrls.forEach(url => {
-          const originalUrl = extractUrl(url);
-          let beforeUrlText = formattedText.substring(formattedText.indexOf(url) - 1, formattedText.indexOf(url));
-          beforeUrlText = beforeUrlText.trim() ? beforeUrlText : "";
-          console.log("beforeUrlText", beforeUrlText);
-          // 正規化されたURLを表示
-          const originalUrlLink = `<a href="${originalUrl}" target="_blank" style="color: #ff6600; text-decoration: underline;">${originalUrl} </a>`;
-          const replacementText = `<strong style="color: #2d87f0;">オリジナル URL:</strong><br>${originalUrlLink}<br>` + beforeUrlText + `<del>${shortenUrl(url)}</del>`;
-          formattedText = formattedText.replace(url, replacementText);
-          formattedText = formattedText.replace(beforeUrlText, "");
-        });
+    const htmlContent = tweetTextElement.innerHTML;
+    const text = tweetTextElement.innerText;
 
-        tweetTextElement.innerHTML = formattedText;
-      }
+    if (text.includes("オリジナル URL")) return;
+
+    const aTagPattern = /<a [^>]*href="https:\/\/t\.co\/[^"]*"[^>]*>[\s\S]*?<\/a>/g;
+    const anchorTags = htmlContent.match(aTagPattern);
+    const urlPattern = /https:\/\/al\.dmm\.co\.jp\/[^\s]+/g;
+    const urls = text.match(urlPattern);
+
+    if (urls && anchorTags) {
+      // console.log("anchorTags", anchorTags);
+      // console.log("urls", urls);
+      const cleanedUrls = urls.map(url => url.replace(/[」】]$/, ''));
+
+      // 各URLを処理
+      let tweetHtml = htmlContent;
+
+      anchorTags.forEach((aTag, index) => {
+        // console.log("index:", index);
+        const originalUrl = extractUrl(cleanedUrls[index]);
+        const aTagIndex = tweetHtml.indexOf(aTag);
+        const aTagLength = aTag.length;
+
+        const untilATag = tweetHtml.slice(0, aTagIndex + aTagLength);
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(untilATag, 'text/html');
+        const allATags = doc.querySelectorAll('a');
+        const aTagElement = allATags[allATags.length - 1];  // 最後の <a> タグ
+
+        let preATag = aTagElement ? aTagElement.previousElementSibling : null;
+        while (preATag && (preATag.tagName === 'BR' || preATag.tagName === 'STRONG')) {
+          preATag = preATag.previousElementSibling;
+        }
+
+        // console.log("preATag:", preATag.textContent);
+        const isLineBreak = /\s$/.test(preATag.textContent);
+        const preATagContent = preATag.textContent;
+        const lineBreakPositions = [...preATagContent.matchAll(/\n/g)].map(match => match.index);
+        const splitIndex = lineBreakPositions.length >= 1 ? lineBreakPositions[lineBreakPositions.length - 1] : -1;
+
+        let mainText = preATagContent;
+        let specialChar = "";
+        
+        if (splitIndex !== -1) {
+          mainText = preATagContent.slice(0, splitIndex);
+          specialChar = preATagContent.slice(splitIndex).trim();
+        }
+
+        // console.log("mainText:", mainText);
+        // console.log("specialChar:", specialChar);
+
+        let prePreATagHTML = '';
+        let sibling = isLineBreak ? preATag : preATag.previousElementSibling;
+
+        while (sibling) {
+          prePreATagHTML = sibling.outerHTML + prePreATagHTML;
+          sibling = sibling.previousElementSibling;
+        }
+
+        // 正規化されたURLを表示
+        const originalUrlLink = `<a href="${originalUrl}" style="text-overflow: unset; color: rgb(29, 155, 240);">${originalUrl} </a>`;
+        const replacementText = (isLineBreak ? "" : `<span>${mainText}</span><br>`)
+          + `<strong style="color: #ff6600;">オリジナル URL:</strong><br>${originalUrlLink}<br>`
+          + `<div  style="color: gray;">アフィリエイトリンク:</div>`
+          + (isLineBreak ? "" : `<span>${specialChar}</span>`)
+          + `<s>${aTag}</s>`;
+        tweetHtml = prePreATagHTML + replacementText + tweetHtml.slice(aTagIndex + aTagLength);
+        // console.log("tweetHtml:", tweetHtml);
+      });
+
+      tweetTextElement.innerHTML = tweetHtml;
     }
+
   });
 }
+
+
 
 function shortenUrl(url, maxLength = 20) {
   if (url.length > maxLength) {
@@ -86,3 +132,5 @@ function extractUrl(affiliateUrl) {
     return '元のURLが見つかりません';
   }
 }
+
+
